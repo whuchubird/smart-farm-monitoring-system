@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Farm Dashboard</title>
+</head>
+<body>
+    <h1>Smart Farm Dashboard</h1>
+
+    {% if latest %}
+        <p><strong>시간:</strong> {{ latest.time }}</p>
+        <p><strong>온도:</strong> {{ latest.temperature }} °C</p>
+        <p><strong>습도:</strong> {{ latest.humidity }} %</p>
+        <p><strong>토양수분:</strong> {{ latest.soil_moisture }} %</p>
+        <p><strong>조도:</strong> {{ latest.light }}</p>
+    {% else %}
+        <p>데이터가 없습니다.</p>
+    {% endif %}
+</body>
+</html>

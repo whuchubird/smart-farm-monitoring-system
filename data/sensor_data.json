@@ -1,0 +1,9 @@
+[
+  {
+    "time": "2026-04-03 10:00:00",
+    "temperature": 24.5,
+    "humidity": 58,
+    "soil_moisture": 42,
+    "light": 780
+  }
+]
