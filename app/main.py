@@ -4,7 +4,8 @@ import os
 
 app = Flask(__name__)
 
-DATA_FILE = os.path.join("data", "sensor_data.json")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(BASE_DIR, "data", "sensor_data.json")
 
 def load_sensor_data():
     try:
