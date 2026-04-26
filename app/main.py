@@ -29,6 +29,7 @@ def save_sensor_data(data):
 def home():
     data = load_sensor_data()
     latest = data[-1] if data else None
+
     return jsonify({
         "message": "Smart Farm Server Running",
         "latest": latest
@@ -48,11 +49,26 @@ def receive_sensor_data():
     if not new_data:
         return jsonify({"error": "No JSON received"}), 400
 
-    new_data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # ESP32가 보낸 측정 시간이 없을 때만 기본값 처리
+    if "timestamp" not in new_data:
+        new_data["timestamp"] = "time_not_set"
+
+    # 라즈베리파이 서버가 받은 시간은 따로 저장
+    new_data["server_received_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     data = load_sensor_data()
     data.append(new_data)
     save_sensor_data(data)
+
+    print(
+        f"[{new_data['server_received_at']}] "
+        f"device={new_data.get('device_id')} "
+        f"esp_time={new_data.get('timestamp')} "
+        f"temp={new_data.get('temperature')} "
+        f"hum={new_data.get('humidity')} "
+        f"soil={new_data.get('soil_moisture')} "
+        f"light={new_data.get('light_digital')}"
+    )
 
     return jsonify({
         "message": "Data received",

@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "../esp32-dummy-node"
+		},
+		{
+			"path": "../esp32-real-sensor-node"
+		}
+	]
+}

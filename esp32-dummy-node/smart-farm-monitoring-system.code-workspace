@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../Project/smart-farm-monitoring-system"
+		},
+		{
+			"name": "Esp32-dummy",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
