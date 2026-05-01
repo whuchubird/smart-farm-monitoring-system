@@ -2,19 +2,233 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Farm Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 20px 32px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 { font-size: 1.4rem; font-weight: 600; color: #f1f5f9; }
+
+        .badge {
+            background: #22c55e;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+
+        .card .label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; }
+
+        .card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
+
+        .card .unit { font-size: 1rem; font-weight: 400; color: #94a3b8; margin-left: 4px; }
+
+        .card.temp  .value { color: #f97316; }
+        .card.hum   .value { color: #38bdf8; }
+        .card.soil  .value { color: #4ade80; }
+        .card.light .value { color: #facc15; }
+
+        .card .timestamp { margin-top: 10px; font-size: 0.72rem; color: #475569; }
+
+        .no-data {
+            background: #1e293b;
+            border: 1px dashed #334155;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: #475569;
+            margin-bottom: 40px;
+        }
+
+        .table-wrap {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+        thead tr { background: #0f172a; }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid #334155;
+        }
+
+        td {
+            padding: 11px 16px;
+            border-bottom: 1px solid #0f172a;
+            color: #cbd5e1;
+        }
+
+        tbody tr:hover { background: #263347; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        td.temp-val  { color: #f97316; font-weight: 600; }
+        td.hum-val   { color: #38bdf8; font-weight: 600; }
+        td.soil-val  { color: #4ade80; font-weight: 600; }
+        td.light-val { color: #facc15; font-weight: 600; }
+
+        .refresh-info {
+            text-align: right;
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Smart Farm Dashboard</h1>
+
+<header>
+    <h1>🌱 Smart Farm Dashboard</h1>
+    <span class="badge">LIVE</span>
+</header>
+
+<div class="container">
+
+    <div class="section-title">최신 센서 값</div>
 
     {% if latest %}
-        <p><strong>시간:</strong> {{ latest.time }}</p>
-        <p><strong>온도:</strong> {{ latest.temperature }} °C</p>
-        <p><strong>습도:</strong> {{ latest.humidity }} %</p>
-        <p><strong>토양수분:</strong> {{ latest.soil_moisture }} %</p>
-        <p><strong>조도:</strong> {{ latest.light }}</p>
+    <div class="cards">
+        <div class="card temp">
+            <div class="label">온도</div>
+            <div class="value">
+                {{ latest.temperature if latest.temperature is not none else '—' }}<span class="unit">°C</span>
+            </div>
+            <div class="timestamp">
+                {% if latest.server_received_at %}{{ latest.server_received_at }}
+                {% elif latest.time %}{{ latest.time }}
+                {% else %}—{% endif %}
+            </div>
+        </div>
+        <div class="card hum">
+            <div class="label">습도</div>
+            <div class="value">
+                {{ latest.humidity if latest.humidity is not none else '—' }}<span class="unit">%</span>
+            </div>
+        </div>
+        <div class="card soil">
+            <div class="label">토양 수분</div>
+            <div class="value">
+                {{ latest.soil_moisture if latest.soil_moisture is not none else '—' }}<span class="unit">%</span>
+            </div>
+        </div>
+        <div class="card light">
+            <div class="label">조도</div>
+            <div class="value">
+                {% if latest.light is not none %}{{ latest.light }}
+                {% elif latest.light_digital is not none %}{{ latest.light_digital }}
+                {% else %}—{% endif %}
+                <span class="unit">lux</span>
+            </div>
+        </div>
+    </div>
     {% else %}
-        <p>데이터가 없습니다.</p>
+    <div class="no-data">센서 데이터가 없습니다.</div>
     {% endif %}
+
+    <div class="section-title">전체 기록 ({{ history | length }}건)</div>
+
+    {% if history %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>시간</th>
+                    <th>디바이스</th>
+                    <th>온도 (°C)</th>
+                    <th>습도 (%)</th>
+                    <th>토양수분 (%)</th>
+                    <th>조도</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td style="color:#475569">{{ loop.index }}</td>
+                    <td>
+                        {% if row.server_received_at %}{{ row.server_received_at }}
+                        {% elif row.time %}{{ row.time }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ row.device_id if row.device_id else '—' }}</td>
+                    <td class="temp-val">{{ row.temperature if row.temperature is not none else '—' }}</td>
+                    <td class="hum-val">{{ row.humidity if row.humidity is not none else '—' }}</td>
+                    <td class="soil-val">{{ row.soil_moisture if row.soil_moisture is not none else '—' }}</td>
+                    <td class="light-val">
+                        {% if row.light is not none %}{{ row.light }}
+                        {% elif row.light_digital is not none %}{{ row.light_digital }}
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="no-data">기록이 없습니다.</div>
+    {% endif %}
+
+    <div class="refresh-info">10초마다 자동 새로고침</div>
+</div>
+
+<script>
+    setTimeout(() => location.reload(), 10000);
+</script>
+
 </body>
 </html>
